@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { GoogleGenAI, LiveServerMessage, Modality } from '@google/genai';
 import { Language, LANGUAGES } from '../types';
 import { getGeminiKey } from '../lib/gemini';
+import { withRetry } from '../utils';
 
 interface Message {
   role: 'user' | 'tutor';
@@ -37,12 +38,13 @@ export const LiveChat: React.FC<LiveChatProps> = ({ language, onAction }) => {
   const [isActive, setIsActive] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [transcription, setTranscription] = useState<Message[]>([]);
-  const [pastSessions, setPastSessions] = useState<ChatSessionLog[]>([]);
   const [viewingHistoryIdx, setViewingHistoryIdx] = useState<number | null>(null);
 
-  const [currentInput, setCurrentInput] = useState('');
-  const [currentOutput, setCurrentOutput] = useState('');
+  const [userTextResponse, setUserTextResponse] = useState('');
   const [audioLevel, setAudioLevel] = useState(0);
+
+  const currentInputRef = useRef('');
+  const currentOutputRef = useRef('');
 
   const [userTextResponse, setUserTextResponse] = useState('');
   const [targetTransLang, setTargetTransLang] = useState<Language>('Português Brasil');
@@ -194,19 +196,24 @@ export const LiveChat: React.FC<LiveChatProps> = ({ language, onAction }) => {
               sourcesRef.current.add(source);
             }
             if (message.serverContent?.inputTranscription) {
-              setCurrentInput(prev => prev + (message.serverContent?.inputTranscription?.text || ''));
+              currentInputRef.current += (message.serverContent?.inputTranscription?.text || '');
             }
             if (message.serverContent?.outputTranscription) {
-              setCurrentOutput(prev => prev + (message.serverContent?.outputTranscription?.text || ''));
+              currentOutputRef.current += (message.serverContent?.outputTranscription?.text || '');
             }
             if (message.serverContent?.turnComplete) {
-              setTranscription(prev => [
-                ...prev,
-                ...(currentInput ? [{ role: 'user', text: currentInput }] : []),
-                ...(currentOutput ? [{ role: 'tutor', text: currentOutput }] : [])
-              ] as any);
-              setCurrentInput('');
-              setCurrentOutput('');
+              const uText = currentInputRef.current;
+              const tText = currentOutputRef.current;
+
+              if (uText || tText) {
+                setTranscription(prev => [
+                  ...prev,
+                  ...(uText ? [{ role: 'user', text: uText }] : []),
+                  ...(tText ? [{ role: 'tutor', text: tText }] : [])
+                ] as any);
+              }
+              currentInputRef.current = '';
+              currentOutputRef.current = '';
             }
             if (message.serverContent?.interrupted) {
               sourcesRef.current.forEach(s => { try { s.stop(); } catch (e) { } });
