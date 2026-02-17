@@ -9,11 +9,15 @@ interface SupabaseSetupProps {
 export const SupabaseSetup: React.FC<SupabaseSetupProps> = ({ onClose }) => {
   const [url, setUrl] = useState(localStorage.getItem('supabase_url') || '');
   const [key, setKey] = useState(localStorage.getItem('supabase_key') || '');
+  const [geminiKey, setGeminiKey] = useState(localStorage.getItem('gemini_api_key') || '');
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     if (url && key) {
       saveSupabaseConfig(url, key);
+      if (geminiKey) {
+        localStorage.setItem('gemini_api_key', geminiKey);
+      }
     } else {
       alert("Por favor, preencha a URL e a Anon Key.");
     }
@@ -25,20 +29,20 @@ export const SupabaseSetup: React.FC<SupabaseSetupProps> = ({ onClose }) => {
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-xl font-bold text-white flex items-center gap-3">
             <i className="fas fa-database text-indigo-400"></i>
-            Configurar Supabase
+            Configurações do App
           </h3>
           <button onClick={onClose} className="text-slate-500 hover:text-white"><i className="fas fa-times"></i></button>
         </div>
 
         <p className="text-slate-400 text-xs mb-6 leading-relaxed">
-          Para salvar o progresso dos alunos, pegue essas informações no painel do seu projeto no Supabase em <b>Project Settings &gt; API</b>.
+          Configure as conexões do seu Tutor 360 IA para salvar progresso e ativar a IA.
         </p>
 
         <form onSubmit={handleSave} className="space-y-4">
           <div>
-            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Project URL</label>
-            <input 
-              type="text" 
+            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Supabase Project URL</label>
+            <input
+              type="text"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://xyz.supabase.co"
@@ -46,9 +50,9 @@ export const SupabaseSetup: React.FC<SupabaseSetupProps> = ({ onClose }) => {
             />
           </div>
           <div>
-            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Anon / Public Key</label>
-            <input 
-              type="password" 
+            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Supabase Anon Key</label>
+            <input
+              type="password"
               value={key}
               onChange={(e) => setKey(e.target.value)}
               placeholder="eyJhbG..."
@@ -56,11 +60,22 @@ export const SupabaseSetup: React.FC<SupabaseSetupProps> = ({ onClose }) => {
             />
           </div>
 
-          <button 
+          <div className="pt-2 border-t border-white/5">
+            <label className="block text-[10px] font-bold text-amber-500 uppercase tracking-widest mb-2">Google Gemini API Key</label>
+            <input
+              type="password"
+              value={geminiKey}
+              onChange={(e) => setGeminiKey(e.target.value)}
+              placeholder="AIzaSy..."
+              className="w-full bg-white/5 border border-amber-500/20 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-amber-500"
+            />
+          </div>
+
+          <button
             type="submit"
             className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-2xl shadow-xl shadow-indigo-900/40 transition-all mt-4"
           >
-            Conectar e Salvar
+            Conectar e Salvar Tudo
           </button>
         </form>
 
