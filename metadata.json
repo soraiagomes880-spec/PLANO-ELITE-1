@@ -1,0 +1,9 @@
+{
+  "name": "Tutor 360 IA - PLANO ELITE-1",
+  "description": "Plano máximo com 100 créditos, busca em tempo real via Google Search e todas as funcionalidades premium desbloqueadas.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
+}
