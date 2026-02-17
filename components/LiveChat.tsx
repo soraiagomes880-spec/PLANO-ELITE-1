@@ -38,6 +38,7 @@ export const LiveChat: React.FC<LiveChatProps> = ({ language, onAction }) => {
   const [isActive, setIsActive] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [transcription, setTranscription] = useState<Message[]>([]);
+  const [pastSessions, setPastSessions] = useState<ChatSessionLog[]>([]);
   const [viewingHistoryIdx, setViewingHistoryIdx] = useState<number | null>(null);
 
   const [userTextResponse, setUserTextResponse] = useState('');
@@ -46,7 +47,6 @@ export const LiveChat: React.FC<LiveChatProps> = ({ language, onAction }) => {
   const currentInputRef = useRef('');
   const currentOutputRef = useRef('');
 
-  const [userTextResponse, setUserTextResponse] = useState('');
   const [targetTransLang, setTargetTransLang] = useState<Language>('Português Brasil');
   const [isTranslatingIdx, setIsTranslatingIdx] = useState<number | null>(null);
 
